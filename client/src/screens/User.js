@@ -7,12 +7,13 @@
 
 // export default User ;
 import { Layout, Menu, Button, List } from 'antd';
-import { SnippetsOutlined, UserOutlined, NotificationOutlined } from '@ant-design/icons';
+import { SnippetsOutlined, UserOutlined, NotificationOutlined, CloseOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 import NewFolder from '../components/NewFolder';
 import { useState, useEffect} from 'react';
 import {useSelector} from 'react-redux';
-import {getAllFiles} from '../actions/file';
+import { toast } from 'react-toastify';
+import {getAllFiles, deleteFile, deleteFolder} from '../actions/file';
 import '../User.css';
 import '../App.css';
 const { SubMenu } = Menu;
@@ -40,8 +41,8 @@ const UserComponent = () => {
     const folderList = await getAllFiles(token, email);
     const folders = folderList.data;
     folders.map((folder, index) => {
-      if (folder.folderName != '') {
-        folderNamesList.push({ title: folder.folderName, description: folder.description });
+      if (folder.folderName != undefined ) {
+        folderNamesList.push({ title: folder.folderName, description: folder.description, folderid: folder._id });
       }
     })
     console.log(folderNamesList)
@@ -58,7 +59,7 @@ const UserComponent = () => {
         if (folder.files.length != 0) {
             const files = folder.files;
             files.map((file,index) => {
-                fileNamesList.push({title: file.name})
+                fileNamesList.push({title: file.name, fileid: file._id, folderid: folder._id})
             })
         }
     })
@@ -69,6 +70,33 @@ useEffect(() => {
     loadFiles();
 }, []);
 
+  const deleteFileItem = async (file) => {
+    try {
+      setFileNamesList(fileNamesList.filter(item => item.fileid != file.fileid))
+      const test = await deleteFile(file.folderid, file.fileid)
+      console.log(test.data)
+      toast.success("File has been deleted"); // toast messages can be commented out
+    }
+    catch (err) {
+      console.log(err);
+      toast.error("File was not deleted")
+    }
+  }
+
+  const deleteFolderItem = async (folder) => {
+
+    try {
+      setFolderNamesList(folderNamesList.filter(item => item.folderid != folder.folderid))
+      const test = await deleteFolder(folder.folderid);
+      console.log(test.data)
+      setFileNamesList(fileNamesList.filter(item => item.folderid != folder.folderid))
+      toast.success("Folder has been deleted"); // toast messages can be commented out
+    }
+    catch (err) {
+      console.log(err);
+      toast.error("Folder was not deleted")
+    }
+  }
 
   return (
     <>
@@ -122,8 +150,8 @@ useEffect(() => {
                     <List.Item.Meta
                       title={<a href="#">{item.title}</a>}
                       description={item.description}
-
                     />
+                    <CloseOutlined onClick={()=>deleteFolderItem(item)}/>
                   </List.Item>
                 )}
               />}
@@ -135,6 +163,7 @@ useEffect(() => {
                     <List.Item.Meta
                       title={<a href="#">{item.title}</a>}
                     />
+                    <CloseOutlined onClick={()=>deleteFileItem(item)}/>
                   </List.Item>
                 )}
               />}

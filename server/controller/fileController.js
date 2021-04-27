@@ -115,4 +115,33 @@ const addFile = async (req, res) => {
 }
 }
 
-module.exports = { addFile, addFileToFolder, getFiles, addFolder };
+const deleteFile = async (req, res) => {
+    try {
+        const file = await medFiles.findOneAndUpdate(
+            { _id: req.params.id1 },
+            { $pull: { files : { _id: req.params.id2} } },
+            { new: true },
+            function(err) {
+                if (err) { console.log(err) }
+            })
+            console.log(file)
+            res.status(200).json({ message: "File deleted successfully" });
+    }
+    catch(err) {
+        console.log(err);
+        res.status(500).send();
+    }
+}
+
+const deleteFolder = async (req, res) => {
+    try {
+        await medFiles.deleteOne({ _id: req.params.id })
+        res.status(200).json({ message: "Folder deleted successfully" });
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).send();
+    }
+}
+
+module.exports = { addFile, addFileToFolder, getFiles, addFolder, deleteFile, deleteFolder };
