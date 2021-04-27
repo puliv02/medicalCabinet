@@ -41,3 +41,14 @@ export const getAllFiles = async(token, addedBy) =>{
     });
     return res ;
 }
+
+export const deleteFile = async(id1, id2) =>{
+    const res = await axios.patch(`http://localhost:5000/api/files/deletefile/${id1}/${id2}`);
+    return res ;
+}
+
+
+export const deleteFolder = async(id) =>{
+    const res = await axios.delete(`http://localhost:5000/api/files/deletefolder/${id}`);
+    return res ;
+}
