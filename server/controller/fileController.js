@@ -49,7 +49,7 @@ const addFileToFolder = async (req, res) => {
                     fileType,
                     file: {
                         data: fs.readFileSync(filePath),
-                        Type
+                        Type: fullType
                     }
                 }
                 console.log(updateData);
@@ -92,7 +92,7 @@ const addFile = async (req, res) => {
                         fileType,
                         file: {
                             data: fs.readFileSync(filePath),
-                            Type
+                            Type : fullType
                         }
                     }]
                 });
