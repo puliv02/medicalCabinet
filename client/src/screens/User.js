@@ -6,14 +6,14 @@
 // }
 
 // export default User ;
-import { Layout, Menu, Button, List } from 'antd';
-import { SnippetsOutlined, UserOutlined, NotificationOutlined, CloseOutlined } from '@ant-design/icons';
+import { Layout, Menu, Button, List, Space } from 'antd';
+import { SnippetsOutlined, UserOutlined, NotificationOutlined, CloseOutlined, FileOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 import NewFolder from '../components/NewFolder';
-import { useState, useEffect} from 'react';
-import {useSelector} from 'react-redux';
+import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import {getAllFiles, deleteFile, deleteFolder} from '../actions/file';
+import { getAllFiles, deleteFile, deleteFolder } from '../actions/file';
 import '../User.css';
 import '../App.css';
 const { SubMenu } = Menu;
@@ -41,7 +41,7 @@ const UserComponent = () => {
     const folderList = await getAllFiles(token, email);
     const folders = folderList.data;
     folders.map((folder, index) => {
-      if (folder.folderName != undefined ) {
+      if (folder.folderName != undefined) {
         folderNamesList.push({ title: folder.folderName, description: folder.description, folderid: folder._id });
       }
     })
@@ -52,24 +52,42 @@ const UserComponent = () => {
     loadFolders();
   }, []);
 
-  const loadFiles = async() => {
+  const loadFiles = async () => {
     const folderListTemp = await getAllFiles(token, email);
     const foldersTemp = folderListTemp.data;
     foldersTemp.map((folder, index) => {
-        if (folder.files.length != 0) {
-            const files = folder.files;
-            files.map((file,index) => {
-                fileNamesList.push({title: file.name, fileid: file._id, folderid: folder._id})
-            })
-        }
+      if (folder.files.length != 0) {
+        const files = folder.files;
+        files.map((file, index) => {
+          fileNamesList.push({
+            title: file.name,
+            fileid: file._id,
+            folderid: folder._id,
+            fileCategory: file.fileType,
+            fileData: file.file.data,
+            contentType: file.file.Type
+          })
+        })
+      }
     })
-    console.log(fileNamesList)
-}
+  }
 
-useEffect(() => {
+  useEffect(() => {
     loadFiles();
-}, []);
+  }, []);
 
+  const openFile = (file) => {
+    try {
+      const buff = Buffer.from(file.fileData.data);
+      const blob = new Blob([buff],
+        { type: file.contentType });
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank', 'location=yes,height=650,width=1000,scrollbars=yes,status=yes');
+    }
+    catch (err) {
+      console.log(err);
+    }
+  }
   const deleteFileItem = async (file) => {
     try {
       setFileNamesList(fileNamesList.filter(item => item.fileid != file.fileid))
@@ -107,9 +125,9 @@ useEffect(() => {
           mode="horizontal"
           defaultSelectedKeys={['1']}
           style={{ lineHeight: '64px' }}>
-          <Menu.Item key="1" onClick={()=>{setShowFolder(false);setShowFiles(false)}}>My Profile</Menu.Item>
-          <Menu.Item key="2" onClick={()=>{setShowFolder(true);setShowFiles(false)}}>My Folders</Menu.Item>
-          <Menu.Item key="3" onClick={()=>{setShowFolder(false);setShowFiles(true)}}>My Files</Menu.Item>
+          <Menu.Item key="1" onClick={() => { setShowFolder(false); setShowFiles(false) }}>My Profile</Menu.Item>
+          <Menu.Item key="2" onClick={() => { setShowFolder(true); setShowFiles(false) }}>My Folders</Menu.Item>
+          <Menu.Item key="3" onClick={() => { setShowFolder(false); setShowFiles(true) }}>My Files</Menu.Item>
         </Menu>
         <Layout style={{ minHeight: '100vh' }}>
           <Sider width={200} className="site-layout-background">
@@ -151,7 +169,7 @@ useEffect(() => {
                       title={<a href="#">{item.title}</a>}
                       description={item.description}
                     />
-                    <CloseOutlined onClick={()=>deleteFolderItem(item)}/>
+                    <CloseOutlined onClick={() => deleteFolderItem(item)} />
                   </List.Item>
                 )}
               />}
@@ -161,9 +179,17 @@ useEffect(() => {
                 renderItem={item => (
                   <List.Item>
                     <List.Item.Meta
-                      title={<a href="#">{item.title}</a>}
+                      title={item.title}
+                      description={item.fileCategory}
                     />
-                    <CloseOutlined onClick={()=>deleteFileItem(item)}/>
+                    <Space>
+                      <Button>
+                        <FileOutlined onClick={() => openFile(item)} />
+                      </Button>
+                      <Button>
+                        <CloseOutlined onClick={() => deleteFileItem(item)} />
+                      </Button>
+                    </Space>
                   </List.Item>
                 )}
               />}
