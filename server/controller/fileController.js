@@ -144,4 +144,16 @@ const deleteFolder = async (req, res) => {
     }
 }
 
-module.exports = { addFile, addFileToFolder, getFiles, addFolder, deleteFile, deleteFolder };
+const getFilesFromFolderId = async (req, res) => {
+    try {
+        const files = await medFiles.find({ _id: req.params.id });
+        console.log(files);
+        res.json(files);
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).send();
+    }
+}
+
+module.exports = { addFile, addFileToFolder, getFiles, addFolder, deleteFile, deleteFolder, getFilesFromFolderId };

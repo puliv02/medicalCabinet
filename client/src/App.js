@@ -9,6 +9,7 @@ import User from './screens/User'
 import NavBar from './screens/NavBar'
 import 'react-toastify/dist/ReactToastify.css'
 import NewFile from './screens/NewFile';
+import Files from './screens/Files';
 
 function App() {
   return (
@@ -26,6 +27,8 @@ function App() {
           <Route exact path="/dashboard" component={User} />
 
           <Route exact path="/newFile/" component = {NewFile} />
+
+          <Route exact path="/files/" component = {Files} />
 
         </Switch>
       </main>

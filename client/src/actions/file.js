@@ -52,3 +52,9 @@ export const deleteFolder = async(id) =>{
     const res = await axios.delete(`http://localhost:5000/api/files/deletefolder/${id}`);
     return res ;
 }
+
+export const fetchFilesFromFolderId = async(id) => {
+    console.log(id);
+    const res = await axios.get(`http://localhost:5000/api/files/fetchfiles/${id}`);
+    return res ;
+}
