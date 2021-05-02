@@ -1,9 +1,16 @@
 import { Layout, Menu, Button, List, Space, Tooltip, Modal } from 'antd';
-import { SnippetsOutlined, UserOutlined, NotificationOutlined, CloseOutlined, FileOutlined, DownloadOutlined } from '@ant-design/icons';
+import {
+  SnippetsOutlined,
+  UserOutlined,
+  NotificationOutlined,
+  CloseOutlined,
+  FileOutlined,
+  DownloadOutlined,
+  FileAddOutlined
+} from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 import NewFolder from '../components/NewFolder';
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getAllFiles, deleteFile, deleteFolder } from '../actions/file';
 import '../User.css';
@@ -68,6 +75,10 @@ const UserComponent = () => {
     loadFiles();
   }, []);
 
+  const addNewFile =(folder) =>{
+    history.push({ pathname :'/newFile',
+    state : {folderId : folder.folderid}});
+  }
   const openFile = (file) => {
     try {
       const buff = Buffer.from(file.fileData.data);
@@ -86,7 +97,7 @@ const UserComponent = () => {
     try {
       const buff = Buffer.from(file.fileData.data);
       const temp = file.contentType.split('/')
-      const type = file.title+"."+temp[temp.length-1]
+      const type = file.title + "." + temp[temp.length - 1]
       const blob = new Blob([buff],
         { type: file.contentType });
       const blobUrl = URL.createObjectURL(blob);
@@ -186,11 +197,18 @@ const UserComponent = () => {
                       title={<a href="#">{item.title}</a>}
                       description={item.description}
                     />
-                    <Tooltip title="Delete the folder">
-                      <Button type="primary" onClick={()=>deleteFolderItem(item)}> 
-                        <CloseOutlined />
+                    <Space>
+                    <Tooltip title="Click to add file">
+                      <Button onClick= {()=>addNewFile(item)}>
+                        <FileAddOutlined />
                       </Button>
-                    </Tooltip>
+                      </Tooltip>
+                      <Tooltip title="Delete the folder">
+                        <Button type="primary" onClick={() => deleteFolderItem(item)}>
+                          <CloseOutlined />
+                        </Button>
+                      </Tooltip>
+                    </Space>
                   </List.Item>
                 )}
               />}
@@ -215,7 +233,7 @@ const UserComponent = () => {
                         </Button>
                       </Tooltip>
                       <Tooltip title="Delete the file">
-                        <Button type="primary" onClick={()=>deleteFileItem(item)}>
+                        <Button type="primary" onClick={() => deleteFileItem(item)}>
                           <CloseOutlined />
                         </Button>
                       </Tooltip>
