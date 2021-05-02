@@ -1,13 +1,5 @@
-// import UserComponent from '../components/UserComponent'
-// const User=() =>{
-//   return(
-//     <UserComponent/>
-//   )
-// }
-
-// export default User ;
-import { Layout, Menu, Button, List, Space } from 'antd';
-import { SnippetsOutlined, UserOutlined, NotificationOutlined, CloseOutlined, FileOutlined } from '@ant-design/icons';
+import { Layout, Menu, Button, List, Space, Tooltip, Modal } from 'antd';
+import { SnippetsOutlined, UserOutlined, NotificationOutlined, CloseOutlined, FileOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 import NewFolder from '../components/NewFolder';
 import { useState, useEffect } from 'react';
@@ -88,6 +80,31 @@ const UserComponent = () => {
       console.log(err);
     }
   }
+
+  //download file
+  const downloadFile = (file) => {
+    try {
+      const buff = Buffer.from(file.fileData.data);
+      const temp = file.contentType.split('/')
+      const type = file.title+"."+temp[temp.length-1]
+      const blob = new Blob([buff],
+        { type: file.contentType });
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.setAttribute(
+        'download',
+        `${type}`,
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    }
+    catch (err) {
+      console.log(err);
+    }
+  }
+
   const deleteFileItem = async (file) => {
     try {
       setFileNamesList(fileNamesList.filter(item => item.fileid != file.fileid))
@@ -169,7 +186,11 @@ const UserComponent = () => {
                       title={<a href="#">{item.title}</a>}
                       description={item.description}
                     />
-                    <CloseOutlined onClick={() => deleteFolderItem(item)} />
+                    <Tooltip title="Delete the folder">
+                      <Button type="primary" onClick={()=>deleteFolderItem(item)}> 
+                        <CloseOutlined />
+                      </Button>
+                    </Tooltip>
                   </List.Item>
                 )}
               />}
@@ -183,27 +204,26 @@ const UserComponent = () => {
                       description={item.fileCategory}
                     />
                     <Space>
-                      <Button>
-                        <FileOutlined onClick={() => openFile(item)} />
-                      </Button>
-                      <Button>
-                        <CloseOutlined onClick={() => deleteFileItem(item)} />
-                      </Button>
+                      <Tooltip title="Click to download the file">
+                        <Button onClick={() => downloadFile(item)} >
+                          <DownloadOutlined />
+                        </Button>
+                      </Tooltip>
+                      <Tooltip title="Click to view the file">
+                        <Button onClick={() => openFile(item)}>
+                          <FileOutlined />
+                        </Button>
+                      </Tooltip>
+                      <Tooltip title="Delete the file">
+                        <Button type="primary" onClick={()=>deleteFileItem(item)}>
+                          <CloseOutlined />
+                        </Button>
+                      </Tooltip>
                     </Space>
                   </List.Item>
                 )}
               />}
             </Content>
-            {/* <Content
-            className="site-layout-background"
-            style={{
-              padding: 24,
-              margin: 0,
-              minHeight: 280,
-            }}
-          >
-            {/* Content */}
-            {/* </Content> */}
           </Layout>
         </Layout>
       </Layout>
