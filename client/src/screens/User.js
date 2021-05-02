@@ -3,7 +3,7 @@ import {
   SnippetsOutlined,
   UserOutlined,
   NotificationOutlined,
-  CloseOutlined,
+  DeleteOutlined,
   FileOutlined,
   DownloadOutlined,
   FileAddOutlined
@@ -144,6 +144,12 @@ const UserComponent = () => {
     }
   }
 
+  const clickFolderName = (folder) =>{
+    console.log(folder)
+    history.push({ pathname :'/files',
+    state : {folderId : folder.folderid}});
+  }
+
   return (
     <>
 
@@ -194,8 +200,9 @@ const UserComponent = () => {
                 renderItem={item => (
                   <List.Item>
                     <List.Item.Meta
-                      title={<a href="#">{item.title}</a>}
+                      title={<a href="">{item.title}</a>}
                       description={item.description}
+                      onClick={()=>clickFolderName(item)}
                     />
                     <Space>
                     <Tooltip title="Click to add file">
@@ -205,7 +212,7 @@ const UserComponent = () => {
                       </Tooltip>
                       <Tooltip title="Delete the folder">
                         <Button type="primary" onClick={() => deleteFolderItem(item)}>
-                          <CloseOutlined />
+                          <DeleteOutlined />
                         </Button>
                       </Tooltip>
                     </Space>
@@ -234,7 +241,7 @@ const UserComponent = () => {
                       </Tooltip>
                       <Tooltip title="Delete the file">
                         <Button type="primary" onClick={() => deleteFileItem(item)}>
-                          <CloseOutlined />
+                          <DeleteOutlined />
                         </Button>
                       </Tooltip>
                     </Space>
