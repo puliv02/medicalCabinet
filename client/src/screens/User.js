@@ -25,7 +25,6 @@ const UserComponent = () => {
     // setNewFile(event.target.value);
     history.push('/newFile')
   }
-  const [state, setState] = useState(false)
   //const currentUser = useSelector(state => state.authReducer).user;
   const token = JSON.parse(window.localStorage.getItem('user')).token
   const email = JSON.parse(window.localStorage.getItem('user')).user.email
@@ -116,11 +115,19 @@ const UserComponent = () => {
     }
   }
 
+// Begin : Logic for deletion of files and folders
+  const [isModalVisibleFile, setModalVisibleFile] = useState(false);
+  const [isModalVisibleFolder, setModalVisibleFolder] = useState(false);
+  const [toBeDeletedFile, setToBeDeletedFile] = useState();
+  const [toBeDeletedFolder, setToBeDeletedFolder] = useState();
+
   const deleteFileItem = async (file) => {
     try {
       setFileNamesList(fileNamesList.filter(item => item.fileid != file.fileid))
       const test = await deleteFile(file.folderid, file.fileid)
       console.log(test.data)
+      setToBeDeletedFile();
+      setModalVisibleFile(false);
       toast.success("File has been deleted"); // toast messages can be commented out
     }
     catch (err) {
@@ -135,6 +142,8 @@ const UserComponent = () => {
       setFolderNamesList(folderNamesList.filter(item => item.folderid != folder.folderid))
       const test = await deleteFolder(folder.folderid);
       console.log(test.data)
+      setToBeDeletedFolder();
+      setModalVisibleFolder(false);
       setFileNamesList(fileNamesList.filter(item => item.folderid != folder.folderid))
       toast.success("Folder has been deleted"); // toast messages can be commented out
     }
@@ -143,6 +152,7 @@ const UserComponent = () => {
       toast.error("Folder was not deleted")
     }
   }
+// End : Logic for deletion of files and folders
 
   const clickFolderName = (folder) =>{
     console.log(folder)
@@ -193,6 +203,16 @@ const UserComponent = () => {
             </Menu>
           </Sider>
           <Layout style={{ padding: '0 24px 24px' }}>
+            <Modal title="Delete File" visible={isModalVisibleFile} onOk={()=>deleteFileItem(toBeDeletedFile)} onCancel={()=>setModalVisibleFile(false)}>
+              <div className='form-group' style={{ display: "flex" }}>
+                <p>Are you sure you want to delete this file?</p>
+              </div>
+            </Modal>
+            <Modal title="Delete Folder" visible={isModalVisibleFolder} onOk={()=>deleteFolderItem(toBeDeletedFolder)} onCancel={()=>setModalVisibleFolder(false)}>
+              <div className='form-group' style={{ display: "flex" }}>
+                <p>Are you sure you want to delete this folder?</p>
+              </div>
+            </Modal>
             < Content style={{ background: '#fff', padding: 24, margin: 0, minHeight: 600 }}>
               {showFolder && <List
                 itemLayout="horizontal"
@@ -211,7 +231,9 @@ const UserComponent = () => {
                       </Button>
                       </Tooltip>
                       <Tooltip title="Delete the folder">
-                        <Button type="primary" onClick={() => deleteFolderItem(item)}>
+                        <Button type="primary" onClick={()=>{
+                          setModalVisibleFolder(true);
+                          setToBeDeletedFolder(item)}}>
                           <DeleteOutlined />
                         </Button>
                       </Tooltip>
@@ -240,7 +262,9 @@ const UserComponent = () => {
                         </Button>
                       </Tooltip>
                       <Tooltip title="Delete the file">
-                        <Button type="primary" onClick={() => deleteFileItem(item)}>
+                        <Button type="primary" onClick={()=>{
+                          setModalVisibleFile(true);
+                          setToBeDeletedFile(item)}}>
                           <DeleteOutlined />
                         </Button>
                       </Tooltip>
